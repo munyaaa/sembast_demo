@@ -1,9 +1,32 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sembast/sembast_io.dart';
+import 'package:sembast_demo/database_config.dart';
 
 Future<void> main() async {
-  runApp(const MainApp());
+  runZonedGuarded(
+    () async {
+      BindingBase.debugZoneErrorsAreFatal = true;
+
+      WidgetsFlutterBinding.ensureInitialized();
+
+      final dbFactory = createDatabaseFactoryIo(
+        rootPath: (await getApplicationDocumentsDirectory()).path,
+      );
+
+      final dbConfig = DatabaseConfig(dbFactory: dbFactory);
+
+      await dbConfig.configure();
+
+      runApp(const MainApp());
+    },
+    (error, stack) {
+      debugPrint(error.toString());
+    },
+  );
 }
 
 class MainApp extends StatelessWidget {
