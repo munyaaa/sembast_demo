@@ -62,6 +62,13 @@ class _MainAppState extends State<MainApp> {
               setState(() {});
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.delete_forever),
+            onPressed: () {
+              todoService.clearTasks();
+              _refresh();
+            },
+          ),
         ],
       ),
       body: FutureBuilder(
@@ -78,31 +85,38 @@ class _MainAppState extends State<MainApp> {
           return ListView.builder(
             itemBuilder: (context, index) {
               return ListTile(
-                  title: Text(data[index].title),
-                  subtitle: Text(data[index].description),
-                  leading: GestureDetector(
-                    onTap: () {
-                      final id = data[index].id;
+                title: Text(data[index].title),
+                subtitle: Text(data[index].description),
+                leading: GestureDetector(
+                  onTap: () {
+                    final id = data[index].id;
 
-                      if (id != null) {
-                        todoService.updateTask(
-                          id,
-                          data[index].copyWith(
-                            isDone: data[index].isDone,
-                          ),
-                        );
-                      }
-                      Future.delayed(
-                        const Duration(milliseconds: 500),
-                        () {
-                          setState(() {});
-                        },
+                    if (id != null) {
+                      todoService.updateTask(
+                        id,
+                        data[index].copyWith(
+                          isDone: !data[index].isDone,
+                        ),
                       );
-                    },
-                    child: data[index].isDone
-                        ? const Icon(Icons.check_box)
-                        : const Icon(Icons.check_box_outline_blank),
-                  ));
+                      _refresh();
+                    }
+                  },
+                  child: data[index].isDone
+                      ? const Icon(Icons.check_box)
+                      : const Icon(Icons.check_box_outline_blank),
+                ),
+                trailing: IconButton(
+                  onPressed: () {
+                    final id = data[index].id;
+
+                    if (id != null) {
+                      todoService.deleteTask(id);
+                      _refresh();
+                    }
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
+              );
             },
             itemCount: data.length,
           );
@@ -130,12 +144,7 @@ class _MainAppState extends State<MainApp> {
                         content: Text('Success save data!'),
                       ),
                     );
-                    Future.delayed(
-                      const Duration(milliseconds: 500),
-                      () {
-                        setState(() {});
-                      },
-                    );
+                    _refresh();
                   },
                 ),
               );
@@ -143,6 +152,15 @@ class _MainAppState extends State<MainApp> {
           );
         },
       ),
+    );
+  }
+
+  void _refresh() {
+    Future.delayed(
+      const Duration(milliseconds: 500),
+      () {
+        setState(() {});
+      },
     );
   }
 }

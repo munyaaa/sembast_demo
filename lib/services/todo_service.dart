@@ -21,6 +21,18 @@ class TodoService {
         );
   }
 
+  Future<void> deleteTask(int id) async {
+    await tasksStore.record(id).delete(
+          DatabaseConfig.dbClient,
+        );
+  }
+
+  Future<void> clearTasks() async {
+    await tasksStore.delete(
+      DatabaseConfig.dbClient,
+    );
+  }
+
   Future<List<TaskModel>> getTasks() async {
     return (await tasksStore.find(DatabaseConfig.dbClient))
         .map(
