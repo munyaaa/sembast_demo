@@ -2,16 +2,19 @@ import 'package:sembast/sembast.dart';
 import 'package:synchronized/synchronized.dart';
 
 class DatabaseConfig {
-  static const String dbName = 'first_db.db';
+  static const String dbName = 'todos.db';
   static const int kVersion1 = 1;
 
   final DatabaseFactory dbFactory;
   final lock = Lock(reentrant: true);
-  Database? db;
+  static Database? db;
 
   DatabaseConfig({
     required this.dbFactory,
   });
+
+  static Database get dbClient =>
+      db != null ? db! : throw Exception('Database is not existis');
 
   Future<void> configure() async {
     db ??= await lock.synchronized<Database?>(
