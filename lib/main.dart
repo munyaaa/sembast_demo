@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sembast_demo/database_config.dart';
-import 'package:sembast_demo/models/upsert_todo_model.dart';
+import 'package:sembast_demo/models/task_model.dart';
 import 'package:sembast_demo/services/todo_service.dart';
 
 Future<void> main() async {
@@ -65,7 +65,7 @@ class _MainAppState extends State<MainApp> {
         ],
       ),
       body: FutureBuilder(
-        future: todoService.getTodos(),
+        future: todoService.getTasks(),
         builder: (context, snapshot) {
           final data = snapshot.data;
 
@@ -82,14 +82,16 @@ class _MainAppState extends State<MainApp> {
                   subtitle: Text(data[index].description),
                   leading: GestureDetector(
                     onTap: () {
-                      todoService.updateTodo(
-                        data[index].id,
-                        UpsertTodoModel(
-                          title: data[index].title,
-                          description: data[index].description,
-                          isDone: !data[index].isDone,
-                        ),
-                      );
+                      final id = data[index].id;
+
+                      if (id != null) {
+                        todoService.updateTask(
+                          id,
+                          data[index].copyWith(
+                            isDone: data[index].isDone,
+                          ),
+                        );
+                      }
                       Future.delayed(
                         const Duration(milliseconds: 500),
                         () {
@@ -116,8 +118,8 @@ class _MainAppState extends State<MainApp> {
                 title: const Text('Create Todo Form'),
                 content: TodoForm(
                   onTapSave: (title, description) {
-                    todoService.saveTodo(
-                      UpsertTodoModel(
+                    todoService.saveTask(
+                      TaskModel.toSave(
                         title: title,
                         description: description,
                         isDone: false,

@@ -1,31 +1,30 @@
 import 'package:sembast/sembast.dart';
 import 'package:sembast_demo/database_config.dart';
-import 'package:sembast_demo/models/todo_model.dart';
-import 'package:sembast_demo/models/upsert_todo_model.dart';
+import 'package:sembast_demo/models/task_model.dart';
 
 class TodoService {
-  static const String todosStoreName = 'todos';
+  static const String tasksStoreName = 'tasks';
 
-  final todosStore = intMapStoreFactory.store(todosStoreName);
+  final tasksStore = intMapStoreFactory.store(tasksStoreName);
 
-  Future<void> saveTodo(UpsertTodoModel model) async {
-    await todosStore.add(
+  Future<void> saveTask(TaskModel model) async {
+    await tasksStore.add(
       DatabaseConfig.dbClient,
       model.toMap(),
     );
   }
 
-  Future<void> updateTodo(int id, UpsertTodoModel model) async {
-    await todosStore.record(id).update(
+  Future<void> updateTask(int id, TaskModel model) async {
+    await tasksStore.record(id).update(
           DatabaseConfig.dbClient,
           model.toMap(),
         );
   }
 
-  Future<List<TodoModel>> getTodos() async {
-    return (await todosStore.find(DatabaseConfig.dbClient))
+  Future<List<TaskModel>> getTasks() async {
+    return (await tasksStore.find(DatabaseConfig.dbClient))
         .map(
-          (e) => TodoModel(
+          (e) => TaskModel(
             id: e.key,
             title: e.value['title']?.toString() ?? '',
             description: e.value['description']?.toString() ?? '',
